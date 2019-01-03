@@ -3,6 +3,8 @@ package weatherapp.danarcheronline.com.weatherapp;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -171,5 +173,25 @@ public class ForecastActivity extends AppCompatActivity {
                 showErrorMessageView();
             }
         }
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_forecast, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemClickedID = item.getItemId();
+        if(itemClickedID == R.id.refresh) {
+//            refresh the weather data by clearing previous data and making a new request
+            // TODO: (03/01/2019) replace refresh function with automatic refreshing
+            tv_weather_data.setText("");
+            loadWeatherData();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
