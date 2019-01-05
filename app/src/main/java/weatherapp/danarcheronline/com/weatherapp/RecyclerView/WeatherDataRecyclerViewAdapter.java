@@ -2,20 +2,38 @@ package weatherapp.danarcheronline.com.weatherapp.RecyclerView;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import weatherapp.danarcheronline.com.weatherapp.R;
 
-public class WeatherDataRecyclerViewAdapater extends RecyclerView.Adapter<WeatherDataRecyclerViewAdapater.WeatherDataViewHolder> {
+public class WeatherDataRecyclerViewAdapter extends RecyclerView.Adapter<WeatherDataRecyclerViewAdapter.WeatherDataViewHolder> {
 
-    //    tag for debuggin purposes
-    private static final String TAG = WeatherDataRecyclerViewAdapater.class.getSimpleName();
+//    tag for debuggin purposes
+    private static final String TAG = WeatherDataRecyclerViewAdapter.class.getSimpleName();
 
 //    member variable to hold weather data
     String[] weatherDataArray;
+
+//
+    private WeatherItemClickListener weatherItemClickListener;
+
+    /**
+     * Interface for the recycler view's item's click listener
+     */
+    public interface WeatherItemClickListener {
+//        runs when an item in the recycler view is clicked
+        void onClick(String weatherItemString);
+    }
+
+    /**
+     * Constructor for {@link WeatherDataRecyclerViewAdapter}
+     * @param weatherItemClickListener
+     */
+    public WeatherDataRecyclerViewAdapter(WeatherItemClickListener weatherItemClickListener) {
+        this.weatherItemClickListener = weatherItemClickListener;
+    }
 
     /**
      * Called when the recycler view instantiates a new view holder instance.
@@ -60,13 +78,13 @@ public class WeatherDataRecyclerViewAdapater extends RecyclerView.Adapter<Weathe
     /**
      * The weather data view holder
      */
-    public class WeatherDataViewHolder extends RecyclerView.ViewHolder {
+    public class WeatherDataViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
 //        view variable instantiations
         TextView tv_weather_data_item_info;
 
         /**
-         * Constructor for the view holder.
+         * Constructor for {@link WeatherDataViewHolder}
          * Caches the necessary views within the view holder
          * @param itemView
          */
@@ -76,6 +94,22 @@ public class WeatherDataRecyclerViewAdapater extends RecyclerView.Adapter<Weathe
 //            cache views
             tv_weather_data_item_info = itemView.findViewById(R.id.tv_weather_data_item_info);
 
+//            set the click listener to the one defined in this class
+            itemView.setOnClickListener(this);
+
+        }
+
+        /**
+         * When a recycler view item is clicked, the corresponding weather data is passed
+         * into {@link WeatherDataRecyclerViewAdapter}'s onClick function,
+         * which is implemented in {@link weatherapp.danarcheronline.com.weatherapp.MainActivity}
+         * @param view
+         */
+        @Override
+        public void onClick(View view) {
+            int adapterPosition = getAdapterPosition();
+            String weatherDataString = weatherDataArray[adapterPosition];
+            weatherItemClickListener.onClick(weatherDataString);
         }
     }
 

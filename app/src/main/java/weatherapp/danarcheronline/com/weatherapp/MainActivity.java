@@ -3,23 +3,23 @@ package weatherapp.danarcheronline.com.weatherapp;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.net.URL;
 
-import weatherapp.danarcheronline.com.weatherapp.RecyclerView.WeatherDataRecyclerViewAdapater;
+import weatherapp.danarcheronline.com.weatherapp.RecyclerView.WeatherDataRecyclerViewAdapter;
 import weatherapp.danarcheronline.com.weatherapp.Utils.NetworkUtils;
 import weatherapp.danarcheronline.com.weatherapp.Utils.WeatherJsonUtils;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements WeatherDataRecyclerViewAdapter.WeatherItemClickListener {
 
 //    tag for debugging purposes
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -30,7 +30,8 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar pb_loading_indicator;
 
 //    other instantiations
-    WeatherDataRecyclerViewAdapater adapater;
+    WeatherDataRecyclerViewAdapter adapater;
+    Toast mainUiToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     private void initRecyclerViewAdapter() {
 //        make recycler view display as a linear list
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        adapater = new WeatherDataRecyclerViewAdapater();
+        adapater = new WeatherDataRecyclerViewAdapter(MainActivity.this);
         rv_weather_data.setLayoutManager(linearLayoutManager);
         rv_weather_data.setAdapter(adapater);
 //        stop recycler view from requesting the layout whenever the adapters contents changes
@@ -99,6 +100,19 @@ public class MainActivity extends AppCompatActivity {
     private void showErrorMessageView() {
         tv_error_message_display.setVisibility(View.VISIBLE);
         rv_weather_data.setVisibility(View.INVISIBLE);
+    }
+
+    /**
+     * displays a toast message with the weather data of the item that is clicked
+     * @param weatherItemString
+     */
+    @Override
+    public void onClick(String weatherItemString) {
+        if(mainUiToast != null) {
+            mainUiToast.cancel();
+        }
+        mainUiToast = Toast.makeText(this, weatherItemString, Toast.LENGTH_LONG);
+        mainUiToast.show();
     }
 
 
