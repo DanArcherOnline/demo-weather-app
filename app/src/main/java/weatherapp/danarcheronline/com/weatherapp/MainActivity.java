@@ -3,35 +3,47 @@ package weatherapp.danarcheronline.com.weatherapp;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import java.net.URL;
+
+import weatherapp.danarcheronline.com.weatherapp.RecyclerView.WeatherDataRecyclerViewAdapater;
 import weatherapp.danarcheronline.com.weatherapp.Utils.NetworkUtils;
 import weatherapp.danarcheronline.com.weatherapp.Utils.WeatherJsonUtils;
 
-public class ForecastActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
 
 //    tag for debugging purposes
-    private static final String TAG = ForecastActivity.class.getSimpleName();
+    private static final String TAG = MainActivity.class.getSimpleName();
 
-//    View variable instantiations
-    TextView tv_weather_data;
+//    view variable instantiations
+    RecyclerView rv_weather_data;
     TextView tv_error_message_display;
     ProgressBar pb_loading_indicator;
 
+//    other instantiations
+    WeatherDataRecyclerViewAdapater adapater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forecast);
 
-        //set up views
+//        set up views
         initViews();
 
-        //show weather data view and get weather data
+//        set up recycler view and adapter
+        initRecyclerViewAdapter();
+
+//        show weather data view and get weather data
         loadWeatherData();
     }
 
@@ -51,27 +63,42 @@ public class ForecastActivity extends AppCompatActivity {
      * Assign the views in activity_forecast to matching variables
      */
     private void initViews() {
-        tv_weather_data = findViewById(R.id.tv_weather_data);
+        rv_weather_data = findViewById(R.id.rv_weather_data);
         tv_error_message_display = findViewById(R.id.tv_error_message_display);
         pb_loading_indicator = findViewById(R.id.pb_loading_indicator);
     }
 
-
     /**
-     * Makes the view that holds all the weather data visible and the error message view invisible
+     * Set up and connect recycler view and adapter
      */
-    private void showWeatherDataView() {
-        tv_error_message_display.setVisibility(View.INVISIBLE);
-        tv_weather_data.setVisibility(View.VISIBLE);
+    private void initRecyclerViewAdapter() {
+//        make recycler view display as a linear list
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        adapater = new WeatherDataRecyclerViewAdapater();
+        rv_weather_data.setLayoutManager(linearLayoutManager);
+        rv_weather_data.setAdapter(adapater);
+//        stop recycler view from requesting the layout whenever the adapters contents changes
+//        (this recycler views width and height will not change regardless of data in the adapter
+//        so it will always have a fixed size in terms of dimensions)
+        rv_weather_data.setHasFixedSize(true);
     }
 
 
     /**
-     *
+     * Makes the recycler view that holds all the weather data visible and the error message view invisible
+     */
+    private void showWeatherDataView() {
+        tv_error_message_display.setVisibility(View.INVISIBLE);
+        rv_weather_data.setVisibility(View.VISIBLE);
+    }
+
+
+    /**
+     * Makes the recycler view that holds all the weather data invisible and the error message view visible
      */
     private void showErrorMessageView() {
         tv_error_message_display.setVisibility(View.VISIBLE);
-        tv_weather_data.setVisibility(View.INVISIBLE);
+        rv_weather_data.setVisibility(View.INVISIBLE);
     }
 
 
@@ -86,6 +113,7 @@ public class ForecastActivity extends AppCompatActivity {
      */
     public class GetWeatherDataAsyncTask extends AsyncTask<String, Void, String[]> {
 
+//        tag for debugging purposes
         private final String TAG = GetWeatherDataAsyncTask.class.getSimpleName();
 
 
@@ -134,9 +162,9 @@ public class ForecastActivity extends AppCompatActivity {
                 String jsonWeatherResponse = NetworkUtils.getResponseFromHttpUrl(weatherRequestURL);
 
 //                get the weather data from the retrieved json and store it in a string array
-                String[] simpleJsonWeatherData = WeatherJsonUtils.getStringsFromJson(jsonWeatherResponse);
+                String[] jsonWeatherData = WeatherJsonUtils.getStringsFromJson(jsonWeatherResponse);
 
-                return simpleJsonWeatherData;
+                return jsonWeatherData;
             }
             catch(Exception e) {
                 return null;
@@ -162,11 +190,8 @@ public class ForecastActivity extends AppCompatActivity {
 //                show the weather data view and get the weather data
                 showWeatherDataView();
 
-//                go through all the retrieved weather data strings and append them to
-//                the weather data view
-                for(String weatherString : weatherData) {
-                    tv_weather_data.append(weatherString + "\n\n\n");
-                }
+//                pass the extracted weather data to the adapter
+                adapater.setWeatherDataArray(weatherData);
             }
             else {
 //                show the error message display
@@ -186,9 +211,9 @@ public class ForecastActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemClickedID = item.getItemId();
         if(itemClickedID == R.id.refresh) {
-//            refresh the weather data by clearing previous data and making a new request
+//            refresh the weather data by setting the adapters data to null and making a new request
             // TODO: (03/01/2019) replace refresh function with automatic refreshing
-            tv_weather_data.setText("");
+            adapater.setWeatherDataArray(null);
             loadWeatherData();
             return true;
         }
