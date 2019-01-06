@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity
 
 
     /**
-     * Assign the views in activity_forecast to matching variables
+     * Assign the views in activity_forecast.xml to matching variables
      */
     private void initViews() {
         rv_weather_data = findViewById(R.id.rv_weather_data);
@@ -104,12 +104,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * displays a toast message with the weather data of the item that is clicked
+     * Opens {@link WeatherDetailsActivity} and passes along the corresponding weather data to it
      * @param weatherItemString
      */
     @Override
     public void onClickWeatherItem(String weatherItemString) {
+//        intent to open the weather details activity
         Intent weatherDetailsIntent = new Intent(MainActivity.this, WeatherDetailsActivity.class);
+//        pass along the weather data in the intent
+        weatherDetailsIntent.putExtra(Intent.EXTRA_TEXT, weatherItemString);
         startActivity(weatherDetailsIntent);
     }
 
@@ -215,7 +218,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_forecast, menu);
+        getMenuInflater().inflate(R.menu.options_menu_main, menu);
         return true;
     }
 
