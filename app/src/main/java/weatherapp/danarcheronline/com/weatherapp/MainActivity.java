@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemClickedID = item.getItemId();
-        if(itemClickedID == R.id.refresh) {
+        if(itemClickedID == R.id.options_menu_refresh) {
 //            refresh the weather data by setting the adapters data to null and making a new request
             // TODO: (03/01/2019) replace refresh function with automatic refreshing
             adapter.setWeatherDataArray(null);

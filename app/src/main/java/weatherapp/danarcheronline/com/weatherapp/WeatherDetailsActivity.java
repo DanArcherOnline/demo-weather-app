@@ -1,6 +1,7 @@
 package weatherapp.danarcheronline.com.weatherapp;
 
 import android.content.Intent;
+import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,6 +9,12 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 public class WeatherDetailsActivity extends AppCompatActivity {
+
+//    tag used for debugging purposes
+    private static final String TAG = WeatherDetailsActivity.class.getSimpleName();
+
+
+    public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
 
 //    view variable instantiations
     TextView tv_weather_details;
@@ -50,11 +57,19 @@ public class WeatherDetailsActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.options_menu_weather_details, menu);
+
+        MenuItem shareMenuItem = menu.findItem(R.id.options_menu_share);
+        shareMenuItem.setIntent(createShareIntent());
+        return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+    private Intent createShareIntent() {
+        Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+                .setType(MIME_TYPE_TEXT_PLAIN)
+                .setText(weatherDetailsString)
+                .getIntent();
+
+        return shareIntent;
     }
 }
