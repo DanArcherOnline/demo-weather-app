@@ -13,13 +13,15 @@ public class WeatherDetailsActivity extends AppCompatActivity {
 //    tag used for debugging purposes
     private static final String TAG = WeatherDetailsActivity.class.getSimpleName();
 
-
+//    text/plain mime type constant
     public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
 
 //    view variable instantiations
     TextView tv_weather_details;
 
+//    retrieved weather data
     String weatherDetailsString;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,7 @@ public class WeatherDetailsActivity extends AppCompatActivity {
         loadWeatherDetails();
 
     }
+
 
     /**
      * makes sure the intent exists and has the necessary data and then gets the weather data
@@ -48,6 +51,7 @@ public class WeatherDetailsActivity extends AppCompatActivity {
         }
     }
 
+
     /**
      * Assign the views in activity_weather_details.xml to matching variables
      */
@@ -55,19 +59,30 @@ public class WeatherDetailsActivity extends AppCompatActivity {
         tv_weather_details = findViewById(R.id.tv_weather_details);
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.options_menu_weather_details, menu);
 
+//        get the menu item for the sharing functionality
         MenuItem shareMenuItem = menu.findItem(R.id.options_menu_share);
+//        attach the sharing intent to the sharing menu button
         shareMenuItem.setIntent(createShareIntent());
         return true;
     }
 
+    /**
+     * Shares the weather data via the devices current sharing capabilities
+     * @return String of weather data
+     */
     private Intent createShareIntent() {
+//        create the sharing intent
         Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+//                set the mime type to text/plain
                 .setType(MIME_TYPE_TEXT_PLAIN)
+//                set the data to share
                 .setText(weatherDetailsString)
+//                build the intent
                 .getIntent();
 
         return shareIntent;
