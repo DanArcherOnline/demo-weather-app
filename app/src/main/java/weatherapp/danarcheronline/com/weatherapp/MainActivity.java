@@ -1,5 +1,6 @@
 package weatherapp.danarcheronline.com.weatherapp;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,7 +31,7 @@ public class MainActivity extends AppCompatActivity
     ProgressBar pb_loading_indicator;
 
 //    other instantiations
-    WeatherDataRecyclerViewAdapter adapater;
+    WeatherDataRecyclerViewAdapter adapter;
     Toast mainUiToast;
 
     @Override
@@ -75,9 +76,9 @@ public class MainActivity extends AppCompatActivity
     private void initRecyclerViewAdapter() {
 //        make recycler view display as a linear list
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        adapater = new WeatherDataRecyclerViewAdapter(MainActivity.this);
+        adapter = new WeatherDataRecyclerViewAdapter(MainActivity.this);
         rv_weather_data.setLayoutManager(linearLayoutManager);
-        rv_weather_data.setAdapter(adapater);
+        rv_weather_data.setAdapter(adapter);
 //        stop recycler view from requesting the layout whenever the adapters contents changes
 //        (this recycler views width and height will not change regardless of data in the adapter
 //        so it will always have a fixed size in terms of dimensions)
@@ -107,12 +108,9 @@ public class MainActivity extends AppCompatActivity
      * @param weatherItemString
      */
     @Override
-    public void onClick(String weatherItemString) {
-        if(mainUiToast != null) {
-            mainUiToast.cancel();
-        }
-        mainUiToast = Toast.makeText(this, weatherItemString, Toast.LENGTH_LONG);
-        mainUiToast.show();
+    public void onClickWeatherItem(String weatherItemString) {
+        Intent weatherDetailsIntent = new Intent(MainActivity.this, WeatherDetailsActivity.class);
+        startActivity(weatherDetailsIntent);
     }
 
 
@@ -205,7 +203,7 @@ public class MainActivity extends AppCompatActivity
                 showWeatherDataView();
 
 //                pass the extracted weather data to the adapter
-                adapater.setWeatherDataArray(weatherData);
+                adapter.setWeatherDataArray(weatherData);
             }
             else {
 //                show the error message display
@@ -227,7 +225,7 @@ public class MainActivity extends AppCompatActivity
         if(itemClickedID == R.id.refresh) {
 //            refresh the weather data by setting the adapters data to null and making a new request
             // TODO: (03/01/2019) replace refresh function with automatic refreshing
-            adapater.setWeatherDataArray(null);
+            adapter.setWeatherDataArray(null);
             loadWeatherData();
             return true;
         }

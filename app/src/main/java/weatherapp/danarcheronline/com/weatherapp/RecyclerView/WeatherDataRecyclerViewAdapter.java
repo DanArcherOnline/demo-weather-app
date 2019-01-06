@@ -24,7 +24,7 @@ public class WeatherDataRecyclerViewAdapter extends RecyclerView.Adapter<Weather
      */
     public interface WeatherItemClickListener {
 //        runs when an item in the recycler view is clicked
-        void onClick(String weatherItemString);
+        void onClickWeatherItem(String weatherItemString);
     }
 
     /**
@@ -46,6 +46,7 @@ public class WeatherDataRecyclerViewAdapter extends RecyclerView.Adapter<Weather
     @Override
     public WeatherDataViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         View weather_data_item_layout = LayoutInflater.from(viewGroup.getContext())
+
                 .inflate(R.layout.weather_data_item, viewGroup, false);
         return new WeatherDataViewHolder(weather_data_item_layout);
 
@@ -109,7 +110,7 @@ public class WeatherDataRecyclerViewAdapter extends RecyclerView.Adapter<Weather
         public void onClick(View view) {
             int adapterPosition = getAdapterPosition();
             String weatherDataString = weatherDataArray[adapterPosition];
-            weatherItemClickListener.onClick(weatherDataString);
+            weatherItemClickListener.onClickWeatherItem(weatherDataString);
         }
     }
 
