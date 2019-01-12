@@ -71,6 +71,17 @@ public class WeatherDetailsActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if(itemId == R.id.options_menu_preference_settings) {
+            Intent preferenceSettingsIntent = new Intent(WeatherDetailsActivity.this, PreferenceSettingsActivity.class);
+            startActivity(preferenceSettingsIntent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     /**
      * Shares the weather data via the devices current sharing capabilities
      * @return String of weather data

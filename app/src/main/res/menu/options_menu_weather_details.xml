@@ -7,4 +7,10 @@
         android:icon="@drawable/ic_share_black_24dp"
         app:showAsAction="ifRoom"
         android:title="Share"/>
+    <item
+        android:id="@+id/options_menu_preference_settings"
+        android:orderInCategory="1"
+        android:icon="@drawable/ic_settings_black_24dp"
+        app:showAsAction="ifRoom"
+        android:title="Settings"/>
 </menu>

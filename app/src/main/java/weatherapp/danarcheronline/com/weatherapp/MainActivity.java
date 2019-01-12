@@ -1,11 +1,14 @@
 package weatherapp.danarcheronline.com.weatherapp;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,10 +20,12 @@ import java.net.URL;
 
 import weatherapp.danarcheronline.com.weatherapp.RecyclerView.WeatherDataRecyclerViewAdapter;
 import weatherapp.danarcheronline.com.weatherapp.Utils.NetworkUtils;
+import weatherapp.danarcheronline.com.weatherapp.Utils.PreferenceUtils;
 import weatherapp.danarcheronline.com.weatherapp.Utils.WeatherJsonUtils;
 
 public class MainActivity extends AppCompatActivity
-        implements WeatherDataRecyclerViewAdapter.WeatherItemClickListener {
+        implements WeatherDataRecyclerViewAdapter.WeatherItemClickListener,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
 //    tag for debugging purposes
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -33,6 +38,19 @@ public class MainActivity extends AppCompatActivity
 //    other instantiations
     WeatherDataRecyclerViewAdapter adapter;
     Toast mainUiToast;
+    boolean preferencesUpdated;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(preferencesUpdated) {
+//            start the background task to retrieve and display the weather data
+            new GetWeatherDataAsyncTask().execute();
+            preferencesUpdated = false;
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +63,25 @@ public class MainActivity extends AppCompatActivity
 //        set up recycler view and adapter
         initRecyclerViewAdapter();
 
+//        register the preference changed listener
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .registerOnSharedPreferenceChangeListener(this);
+
+
 //        show weather data view and get weather data
         loadWeatherData();
+
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+//        unregister the preference changed listener
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
+
     }
 
 
@@ -57,7 +92,7 @@ public class MainActivity extends AppCompatActivity
     private void loadWeatherData() {
         showWeatherDataView();
 //        start the async task with the location string parameter to get the weather data
-        new GetWeatherDataAsyncTask().execute("Tokyo");
+        new GetWeatherDataAsyncTask().execute();
     }
 
 
@@ -69,6 +104,7 @@ public class MainActivity extends AppCompatActivity
         tv_error_message_display = findViewById(R.id.tv_error_message_display);
         pb_loading_indicator = findViewById(R.id.pb_loading_indicator);
     }
+
 
     /**
      * Set up and connect recycler view and adapter
@@ -103,6 +139,7 @@ public class MainActivity extends AppCompatActivity
         rv_weather_data.setVisibility(View.INVISIBLE);
     }
 
+
     /**
      * Opens {@link WeatherDetailsActivity} and passes along the corresponding weather data to it
      * @param weatherItemString
@@ -117,6 +154,14 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String preferenceKey) {
+        if(preferenceKey.equals("location")) {
+            preferencesUpdated = true;
+        }
+    }
+
+
     /**
      *  an async task to fetch the json weather data from the open weather map api,
      *  and displays it if the http request and json extraction was successful.
@@ -126,7 +171,7 @@ public class MainActivity extends AppCompatActivity
      *
      *  Takes a string location and produces a string array of extracted weather data.
      */
-    public class GetWeatherDataAsyncTask extends AsyncTask<String, Void, String[]> {
+    public class GetWeatherDataAsyncTask extends AsyncTask<Void, Void, String[]> {
 
 //        tag for debugging purposes
         private final String TAG = GetWeatherDataAsyncTask.class.getSimpleName();
@@ -151,23 +196,17 @@ public class MainActivity extends AppCompatActivity
          * a string array variable called 'simpleJsonWeatherData'.
          * If either the http request or the json data extraction is unsuccessful, the error is
          * caught and null is returned.
-         * Null is also returned if there were no location strings in the string array parameter.
          *
-         * @param strings
          * @return simpleJsonWeatherData
          * @return null
          */
         @Override
-        protected String[] doInBackground(String... strings) {
-
-//            return null if there are no location strings in the locations string array
-            if(strings.length == 0) {
-                return null;
-            }
+        protected String[] doInBackground(Void... voids) {
 
 //            get the first location string from the locations string array
 //            there should only be one location string in the string array anyway
-            String location = strings[0];
+//            String location = strings[0];
+            String location = PreferenceUtils.getPreferenceLocation(MainActivity.this);
 
 //            convert a string url with the 'location' parameter as a query in the url to a URL object
             URL weatherRequestURL = NetworkUtils.buildUri(location);
@@ -222,15 +261,22 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemClickedID = item.getItemId();
-        if(itemClickedID == R.id.options_menu_refresh) {
-//            refresh the weather data by setting the adapters data to null and making a new request
-            // TODO: (03/01/2019) replace refresh function with automatic refreshing
-            adapter.setWeatherDataArray(null);
-            loadWeatherData();
-            return true;
+        switch(itemClickedID) {
+            case R.id.options_menu_refresh:
+//                refresh the weather data by setting the adapters data to null and making a new request
+                // TODO: (03/01/2019) replace refresh function with automatic refreshing
+                adapter.setWeatherDataArray(null);
+                loadWeatherData();
+                return true;
+            case R.id.options_menu_preference_settings:
+//                open preference settings screen
+                Intent preferenceSettingsIntent = new Intent(MainActivity.this, PreferenceSettingsActivity.class);
+                startActivity(preferenceSettingsIntent);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

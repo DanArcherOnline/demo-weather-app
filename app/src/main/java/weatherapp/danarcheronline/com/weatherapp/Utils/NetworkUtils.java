@@ -61,6 +61,7 @@ public class NetworkUtils {
      * @throws IOException if something goes wrong with the network or stream reading.
      */
     public static String getResponseFromHttpUrl(URL url) throws IOException {
+
 //        create a HttpURLConnection object with the passed in URL object to set up the connection
         HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
         try {
@@ -75,6 +76,7 @@ public class NetworkUtils {
 
 //            check there is still something to retrieve
             boolean hasInput = scanner.hasNext();
+
             if(hasInput) {
 //                return all retrieved json data
                 return scanner.next();
