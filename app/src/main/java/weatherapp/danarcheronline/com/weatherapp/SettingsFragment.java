@@ -43,7 +43,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         }
     }
 
-    
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String preferenceKey) {
 //        find the preference that was changed
@@ -54,10 +54,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
 
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-//        unregister the preference change listener
+    public void onDestroy() {
+        super.onDestroy();
+        //        unregister the preference change listener
         getPreferenceScreen().getSharedPreferences()
                 .unregisterOnSharedPreferenceChangeListener(this);
+
     }
 }
