@@ -4,6 +4,8 @@ import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.util.Log;
 
+import java.util.List;
+
 import weatherapp.danarcheronline.com.weatherapp.Data.Database.WeatherDAO;
 import weatherapp.danarcheronline.com.weatherapp.Data.Database.WeatherDatabase;
 import weatherapp.danarcheronline.com.weatherapp.Data.Database.WeatherForecastEntity;
@@ -47,7 +49,7 @@ public class Repository {
         return sInstance;
     }
 
-    public LiveData<WeatherForecastEntity> getAllWeather() {
+    public LiveData<List<WeatherForecastEntity>> getAllWeather() {
         initializeData();
         return mWeatherDAO.getAll();
     }

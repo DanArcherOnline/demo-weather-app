@@ -11,14 +11,14 @@ import weatherapp.danarcheronline.com.weatherapp.Data.Repository;
 public class MainActivityViewModel extends ViewModel {
 
     private final Repository mRepository;
-    private final LiveData<WeatherForecastEntity> mWeatherForecastEntity;
+    private final LiveData<List<WeatherForecastEntity>> mWeatherForecastEntity;
 
     public MainActivityViewModel(Repository repository) {
         this.mRepository = repository;
         this.mWeatherForecastEntity = mRepository.getAllWeather();
     }
 
-    public LiveData<WeatherForecastEntity> getWeather() {
+    public LiveData<List<WeatherForecastEntity>> getWeather() {
         return mWeatherForecastEntity;
     }
 }

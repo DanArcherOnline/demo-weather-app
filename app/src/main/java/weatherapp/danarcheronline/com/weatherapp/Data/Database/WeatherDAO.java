@@ -16,6 +16,6 @@ public interface WeatherDAO {
     public void bulkInsert(WeatherForecastEntity... weatherForecastEntities);
 
     @Query("SELECT * FROM weather")
-    public LiveData<WeatherForecastEntity> getAll();
+    public LiveData<List<WeatherForecastEntity>> getAll();
 
 }

@@ -1,11 +1,14 @@
 package weatherapp.danarcheronline.com.weatherapp.RecyclerView;
 
+import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import java.util.List;
 
 import weatherapp.danarcheronline.com.weatherapp.Data.Database.WeatherForecastEntity;
 import weatherapp.danarcheronline.com.weatherapp.R;
@@ -17,7 +20,7 @@ public class WeatherDataRecyclerViewAdapter extends RecyclerView.Adapter<Weather
     private static final String TAG = WeatherDataRecyclerViewAdapter.class.getSimpleName();
 
 //    member variable to hold weather data
-    WeatherForecastEntity[] weatherDataArray;
+    List<WeatherForecastEntity> weatherEntitiesDataArray;
 
 //
     private WeatherItemClickListener weatherItemClickListener;
@@ -63,7 +66,7 @@ public class WeatherDataRecyclerViewAdapter extends RecyclerView.Adapter<Weather
      */
     @Override
     public void onBindViewHolder(@NonNull WeatherDataViewHolder weatherDataViewHolder, int adapterPosition) {
-        WeatherForecastEntity weatherForecastEntity = weatherDataArray[adapterPosition];
+        WeatherForecastEntity weatherForecastEntity = weatherEntitiesDataArray.get(adapterPosition);
         String weatherItemString = makeDisplayStringFromWeatherForecastEntity(weatherForecastEntity);
         weatherDataViewHolder.tv_weather_data_item_info.setText(weatherItemString);
     }
@@ -85,10 +88,10 @@ public class WeatherDataRecyclerViewAdapter extends RecyclerView.Adapter<Weather
      */
     @Override
     public int getItemCount() {
-        if(weatherDataArray == null) {
+        if(weatherEntitiesDataArray == null) {
             return 0;
         }
-        return weatherDataArray.length;
+        return weatherEntitiesDataArray.size();
     }
 
     /**
@@ -124,7 +127,7 @@ public class WeatherDataRecyclerViewAdapter extends RecyclerView.Adapter<Weather
         @Override
         public void onClick(View view) {
             int adapterPosition = getAdapterPosition();
-            WeatherForecastEntity weatherForecastEntity = weatherDataArray[adapterPosition];
+            WeatherForecastEntity weatherForecastEntity = weatherEntitiesDataArray.get(adapterPosition);
             String weatherItemString = makeDisplayStringFromWeatherForecastEntity(weatherForecastEntity);
             weatherItemClickListener.onClickWeatherItem(weatherItemString);
         }
@@ -132,10 +135,10 @@ public class WeatherDataRecyclerViewAdapter extends RecyclerView.Adapter<Weather
 
     /**
      * Set the weather data and notify the recycler view that changes have been made to the adapter
-     * @param weatherDataArray
+     * @param weatherEntitiesDataArray
      */
-    public void setWeatherDataArray(WeatherForecastEntity[] weatherDataArray) {
-        this.weatherDataArray = weatherDataArray;
+    public void setWeatherEntitiesDataArray(List<WeatherForecastEntity> weatherEntitiesDataArray) {
+        this.weatherEntitiesDataArray = weatherEntitiesDataArray;
 //        let the recycler view know that the data has changed and ti should reflect these updates
         notifyDataSetChanged();
     }

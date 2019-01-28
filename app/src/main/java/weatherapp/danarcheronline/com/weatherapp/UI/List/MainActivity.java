@@ -17,15 +17,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import weatherapp.danarcheronline.com.weatherapp.Data.Database.WeatherDatabase;
 import weatherapp.danarcheronline.com.weatherapp.Data.Database.WeatherForecastEntity;
-import weatherapp.danarcheronline.com.weatherapp.Data.Repository;
 import weatherapp.danarcheronline.com.weatherapp.UI.Preferences.PreferenceSettingsActivity;
 import weatherapp.danarcheronline.com.weatherapp.R;
 import weatherapp.danarcheronline.com.weatherapp.RecyclerView.WeatherDataRecyclerViewAdapter;
 import weatherapp.danarcheronline.com.weatherapp.Data.Network.WeatherSync;
 import weatherapp.danarcheronline.com.weatherapp.UI.Detail.WeatherDetailsActivity;
-import weatherapp.danarcheronline.com.weatherapp.Utils.AppExecutors;
 import weatherapp.danarcheronline.com.weatherapp.Utils.InjectorUtils;
 
 public class MainActivity extends AppCompatActivity
@@ -53,7 +50,7 @@ public class MainActivity extends AppCompatActivity
 
         if(preferencesUpdated) {
 //            start the background task to retrieve and display the weather data
-            new GetWeatherDataAsyncTask().execute();
+//            new GetWeatherDataAsyncTask().execute();
             preferencesUpdated = false;
         }
     }
@@ -69,6 +66,8 @@ public class MainActivity extends AppCompatActivity
         mainActivityViewModel.getWeather().observe(this, weatherForecastEntity -> {
             //updat ui here
             Log.d(TAG, "onCreate: info from MainActivityViewModel: " + weatherForecastEntity);
+            adapter.setWeatherEntitiesDataArray(weatherForecastEntity);
+
         });
 
 //        set up views
@@ -106,7 +105,7 @@ public class MainActivity extends AppCompatActivity
     private void loadWeatherData() {
         showWeatherDataView();
 //        start the async task with the location string parameter to get the weather data
-        new GetWeatherDataAsyncTask().execute();
+//        new GetWeatherDataAsyncTask().execute();
     }
 
 
@@ -185,68 +184,68 @@ public class MainActivity extends AppCompatActivity
      *
      *  Takes a string location and produces a string array of extracted weather data.
      */
-    public class GetWeatherDataAsyncTask extends AsyncTask<Void, Void, WeatherForecastEntity[]> {
-
-//        tag for debugging purposes
-        private final String TAG = GetWeatherDataAsyncTask.class.getSimpleName();
-
-
-        /**
-         * Before the async task starts:
-         * show the loading progress bar
-         */
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pb_loading_indicator.setVisibility(View.VISIBLE);
-
-        }
-
-
-        /**
-         * The Async task on the background thread:
-         * Tries to get save some json weather data using the passed in location string
-         * from open weather maps api and then extract and put the data into
-         * a string array variable called 'simpleJsonWeatherData'.
-         * If either the http request or the json data extraction is unsuccessful, the error is
-         * caught and null is returned.
-         *
-         * @return simpleJsonWeatherData
-         * @return null
-         */
-        @Override
-        protected WeatherForecastEntity[] doInBackground(Void... voids) {
-            return WeatherSync.syncWeather(MainActivity.this);
-        }
-
-
-        /**
-         *After the background task has been completed:
-         * hides the loading loading progress bar and inserts the data into the weather data view.
-         * If the weather data could not be retrieved, the error message display is shown instead.
-         *
-         * @param weatherData
-         */
-        @Override
-        protected void onPostExecute(WeatherForecastEntity[] weatherData) {
-
-//            make the loading progress bar invisible
-            pb_loading_indicator.setVisibility(View.INVISIBLE);
-
-//            if there is weather data
-            if(weatherData != null) {
-//                show the weather data view and get the weather data
-                showWeatherDataView();
-
-//                pass the extracted weather data to the adapter
-                adapter.setWeatherDataArray(weatherData);
-            }
-            else {
-//                show the error message display
-                showErrorMessageView();
-            }
-        }
-    }
+//    public class GetWeatherDataAsyncTask extends AsyncTask<Void, Void, WeatherForecastEntity[]> {
+//
+////        tag for debugging purposes
+//        private final String TAG = GetWeatherDataAsyncTask.class.getSimpleName();
+//
+//
+//        /**
+//         * Before the async task starts:
+//         * show the loading progress bar
+//         */
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//            pb_loading_indicator.setVisibility(View.VISIBLE);
+//
+//        }
+//
+//
+//        /**
+//         * The Async task on the background thread:
+//         * Tries to get save some json weather data using the passed in location string
+//         * from open weather maps api and then extract and put the data into
+//         * a string array variable called 'simpleJsonWeatherData'.
+//         * If either the http request or the json data extraction is unsuccessful, the error is
+//         * caught and null is returned.
+//         *
+//         * @return simpleJsonWeatherData
+//         * @return null
+//         */
+//        @Override
+//        protected WeatherForecastEntity[] doInBackground(Void... voids) {
+//            return WeatherSync.syncWeather(MainActivity.this);
+//        }
+//
+//
+//        /**
+//         *After the background task has been completed:
+//         * hides the loading loading progress bar and inserts the data into the weather data view.
+//         * If the weather data could not be retrieved, the error message display is shown instead.
+//         *
+//         * @param weatherData
+//         */
+//        @Override
+//        protected void onPostExecute(WeatherForecastEntity[] weatherData) {
+//
+////            make the loading progress bar invisible
+//            pb_loading_indicator.setVisibility(View.INVISIBLE);
+//
+////            if there is weather data
+//            if(weatherData != null) {
+////                show the weather data view and get the weather data
+//                showWeatherDataView();
+//
+////                pass the extracted weather data to the adapter
+//                adapter.setWeatherEntitiesDataArray(weatherData);
+//            }
+//            else {
+////                show the error message display
+//                showErrorMessageView();
+//            }
+//        }
+//    }
 
 
     @Override
@@ -263,7 +262,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.options_menu_refresh:
 //                refresh the weather data by setting the adapters data to null and making a new request
                 // TODO: (03/01/2019) replace refresh function with firebase job scheduler
-                adapter.setWeatherDataArray(null);
+                adapter.setWeatherEntitiesDataArray(null);
                 loadWeatherData();
                 return true;
             case R.id.options_menu_preference_settings:
