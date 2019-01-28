@@ -1,4 +1,4 @@
-package weatherapp.danarcheronline.com.weatherapp.Utils;
+package weatherapp.danarcheronline.com.weatherapp.UI.Preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;

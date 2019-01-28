@@ -1,10 +1,12 @@
-package weatherapp.danarcheronline.com.weatherapp;
+package weatherapp.danarcheronline.com.weatherapp.UI.Preferences;
 
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
+
+import weatherapp.danarcheronline.com.weatherapp.R;
 
 public class PreferenceSettingsActivity extends AppCompatActivity {
 

@@ -1,10 +1,12 @@
-package weatherapp.danarcheronline.com.weatherapp.Utils;
+package weatherapp.danarcheronline.com.weatherapp.Data.Network;
 
 import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.net.HttpURLConnection;
+
+import weatherapp.danarcheronline.com.weatherapp.Data.Database.WeatherForecastEntity;
 
 public final class WeatherJsonUtils {
 
@@ -19,7 +21,7 @@ public final class WeatherJsonUtils {
      * @return A string array of weather data retrieved from open weather map
      * @throws JSONException
      */
-    public static String[] getStringsFromJson(String weatherJsonString) throws JSONException {
+    public static WeatherForecastEntity[] getWeatherEntitiesFromJson(String weatherJsonString) throws JSONException {
 
 //        json key/value pair key constants
         //holds the weather data for that forecast
@@ -38,7 +40,7 @@ public final class WeatherJsonUtils {
         final String OWM_MESSAGE_CODE = "cod";
 
 //        the string array to hold all the weather data
-        String[] parsedWeatherDataArray;
+        WeatherForecastEntity[] parsedWeatherForecastEntities;
 
 //        convert the json string data into a json object
         JSONObject weatherJsonObject = new JSONObject(weatherJsonString);
@@ -53,34 +55,34 @@ public final class WeatherJsonUtils {
             switch (errorCode) {
 //
                 case HttpURLConnection.HTTP_OK:
-                    Log.d(TAG, "getStringsFromJson: HTTP OK");
+                    Log.d(TAG, "getWeatherEntitiesFromJson: HTTP OK");
                     break;
                 case HttpURLConnection.HTTP_NOT_FOUND:
                     //location invalid
-                    Log.d(TAG, "getStringsFromJson: HTTP NOT FOUND");
+                    Log.d(TAG, "getWeatherEntitiesFromJson: HTTP NOT FOUND");
                     return null;
                 default:
                     //server might be down
-                    Log.d(TAG, "getStringsFromJson: Server may be down");
+                    Log.d(TAG, "getWeatherEntitiesFromJson: Server may be down");
                     return null;
             }
         }
 
 //
         JSONArray weatherJsonArray = weatherJsonObject.getJSONArray(OWM_LIST);
-        Log.d(TAG, "getStringsFromJson: weatherJsonArray: " + weatherJsonArray);
+        Log.d(TAG, "getWeatherEntitiesFromJson: weatherJsonArray: " + weatherJsonArray);
 
-        parsedWeatherDataArray = new String[weatherJsonArray.length()];
-        Log.d(TAG, "getStringsFromJson: parsedWeatherDataArray length: " + parsedWeatherDataArray.length);
+        parsedWeatherForecastEntities = new WeatherForecastEntity[weatherJsonArray.length()];
+        Log.d(TAG, "getWeatherEntitiesFromJson: parsedWeatherForecastEntities length: " + parsedWeatherForecastEntities.length);
 
         // TODO: (02/01/2019) make sure date is correct and convert timestamp to readable formatted date
         long localDate = System.currentTimeMillis();
-        Log.d(TAG, "getStringsFromJson: localDate = " + localDate);
+        Log.d(TAG, "getWeatherEntitiesFromJson: localDate = " + localDate);
 
         for(int i = 0; i < weatherJsonArray.length(); i++) {
 
-            double high;
-            double low;
+            String high;
+            String low;
             String description;
 
 //            get the weather forecast object
@@ -97,18 +99,16 @@ public final class WeatherJsonUtils {
             JSONObject temperatureObject = weatherForecastObject.getJSONObject(OWM_MAIN);
 
 //            get the highest temperature
-            high = temperatureObject.getDouble(OWM_MAX);
+            high = String.valueOf(temperatureObject.getDouble(OWM_MAX));
 
 //            get the lowest temperature
-            low = temperatureObject.getDouble(OWM_MIN);
+            low = String.valueOf(temperatureObject.getDouble(OWM_MIN));
 
-//            concatenate all extracted weather data into a single string and append it a string array
-            parsedWeatherDataArray[i] =
-                    "Date: " + localDate + " - " + description + "\n"
-                    + "Lowest Temperature: " + low + "\n"
-                    + "Highest Temperature" + high;
+            parsedWeatherForecastEntities[i] = new WeatherForecastEntity(description, high, low);
+
         }
 
-        return  parsedWeatherDataArray;
+        Log.d(TAG, "getWeatherEntitiesFromJson: parsedWeatherForecastEntities: " + parsedWeatherForecastEntities.toString());
+        return  parsedWeatherForecastEntities;
     }
 }

@@ -1,4 +1,4 @@
-package weatherapp.danarcheronline.com.weatherapp.Utils;
+package weatherapp.danarcheronline.com.weatherapp.Data.Network;
 
 import android.net.Uri;
 import android.util.Log;

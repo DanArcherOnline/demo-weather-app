@@ -3,9 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/frag_setting_preferences"
-    android:name="weatherapp.danarcheronline.com.weatherapp.SettingsFragment"
+    android:name="weatherapp.danarcheronline.com.weatherapp.UI.Preferences.SettingsFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PreferenceSettingsActivity">
+    tools:context=".UI.Preferences.PreferenceSettingsActivity">
 
 </fragment>

@@ -1,4 +1,4 @@
-package weatherapp.danarcheronline.com.weatherapp;
+package weatherapp.danarcheronline.com.weatherapp.UI.Detail;
 
 import android.content.Intent;
 import android.support.v4.app.ShareCompat;
@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+
+import weatherapp.danarcheronline.com.weatherapp.UI.Preferences.PreferenceSettingsActivity;
+import weatherapp.danarcheronline.com.weatherapp.R;
 
 public class WeatherDetailsActivity extends AppCompatActivity {
 

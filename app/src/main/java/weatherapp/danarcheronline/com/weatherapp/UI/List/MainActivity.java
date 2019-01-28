@@ -1,5 +1,6 @@
-package weatherapp.danarcheronline.com.weatherapp;
+package weatherapp.danarcheronline.com.weatherapp.UI.List;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -16,12 +17,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.net.URL;
-
+import weatherapp.danarcheronline.com.weatherapp.Data.Database.WeatherDatabase;
+import weatherapp.danarcheronline.com.weatherapp.Data.Database.WeatherForecastEntity;
+import weatherapp.danarcheronline.com.weatherapp.Data.Repository;
+import weatherapp.danarcheronline.com.weatherapp.UI.Preferences.PreferenceSettingsActivity;
+import weatherapp.danarcheronline.com.weatherapp.R;
 import weatherapp.danarcheronline.com.weatherapp.RecyclerView.WeatherDataRecyclerViewAdapter;
-import weatherapp.danarcheronline.com.weatherapp.Utils.NetworkUtils;
-import weatherapp.danarcheronline.com.weatherapp.Utils.PreferenceUtils;
-import weatherapp.danarcheronline.com.weatherapp.Utils.WeatherJsonUtils;
+import weatherapp.danarcheronline.com.weatherapp.Data.Network.WeatherSync;
+import weatherapp.danarcheronline.com.weatherapp.UI.Detail.WeatherDetailsActivity;
+import weatherapp.danarcheronline.com.weatherapp.Utils.AppExecutors;
+import weatherapp.danarcheronline.com.weatherapp.Utils.InjectorUtils;
 
 public class MainActivity extends AppCompatActivity
         implements WeatherDataRecyclerViewAdapter.WeatherItemClickListener,
@@ -40,6 +45,8 @@ public class MainActivity extends AppCompatActivity
     Toast mainUiToast;
     boolean preferencesUpdated;
 
+    private MainActivityViewModel mainActivityViewModel;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -56,6 +63,13 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forecast);
+
+        MainActivityViewModelFactory factory = InjectorUtils.provideMainActivityViewModelFactory(this);
+        mainActivityViewModel = ViewModelProviders.of(this, factory).get(MainActivityViewModel.class);
+        mainActivityViewModel.getWeather().observe(this, weatherForecastEntity -> {
+            //updat ui here
+            Log.d(TAG, "onCreate: info from MainActivityViewModel: " + weatherForecastEntity);
+        });
 
 //        set up views
         initViews();
@@ -171,7 +185,7 @@ public class MainActivity extends AppCompatActivity
      *
      *  Takes a string location and produces a string array of extracted weather data.
      */
-    public class GetWeatherDataAsyncTask extends AsyncTask<Void, Void, String[]> {
+    public class GetWeatherDataAsyncTask extends AsyncTask<Void, Void, WeatherForecastEntity[]> {
 
 //        tag for debugging purposes
         private final String TAG = GetWeatherDataAsyncTask.class.getSimpleName();
@@ -201,28 +215,8 @@ public class MainActivity extends AppCompatActivity
          * @return null
          */
         @Override
-        protected String[] doInBackground(Void... voids) {
-
-//            get the first location string from the locations string array
-//            there should only be one location string in the string array anyway
-//            String location = strings[0];
-            String location = PreferenceUtils.getPreferenceLocation(MainActivity.this);
-
-//            convert a string url with the 'location' parameter as a query in the url to a URL object
-            URL weatherRequestURL = NetworkUtils.buildUri(location);
-
-            try {
-//                get the json data using the URL object
-                String jsonWeatherResponse = NetworkUtils.getResponseFromHttpUrl(weatherRequestURL);
-
-//                get the weather data from the retrieved json and store it in a string array
-                String[] jsonWeatherData = WeatherJsonUtils.getStringsFromJson(jsonWeatherResponse);
-
-                return jsonWeatherData;
-            }
-            catch(Exception e) {
-                return null;
-            }
+        protected WeatherForecastEntity[] doInBackground(Void... voids) {
+            return WeatherSync.syncWeather(MainActivity.this);
         }
 
 
@@ -234,7 +228,7 @@ public class MainActivity extends AppCompatActivity
          * @param weatherData
          */
         @Override
-        protected void onPostExecute(String[] weatherData) {
+        protected void onPostExecute(WeatherForecastEntity[] weatherData) {
 
 //            make the loading progress bar invisible
             pb_loading_indicator.setVisibility(View.INVISIBLE);
@@ -268,7 +262,7 @@ public class MainActivity extends AppCompatActivity
         switch(itemClickedID) {
             case R.id.options_menu_refresh:
 //                refresh the weather data by setting the adapters data to null and making a new request
-                // TODO: (03/01/2019) replace refresh function with automatic refreshing
+                // TODO: (03/01/2019) replace refresh function with firebase job scheduler
                 adapter.setWeatherDataArray(null);
                 loadWeatherData();
                 return true;

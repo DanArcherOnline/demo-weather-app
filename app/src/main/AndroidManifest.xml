@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".UI.List.MainActivity"
             android:launchMode="singleTop"> <!-- make sure main activity is not recreated when navigating back to it -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,14 +21,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".WeatherDetailsActivity"
-            android:parentActivityName=".MainActivity"> <!-- provide up navigation (a back button) -->
+            android:name=".UI.Detail.WeatherDetailsActivity"
+            android:parentActivityName=".UI.List.MainActivity"> <!-- provide up navigation (a back button) -->
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".UI.List.MainActivity" />
         </activity>
-        <activity android:name=".PreferenceSettingsActivity" />
+        <activity android:name=".UI.Preferences.PreferenceSettingsActivity" />
     </application>
 
 </manifest>

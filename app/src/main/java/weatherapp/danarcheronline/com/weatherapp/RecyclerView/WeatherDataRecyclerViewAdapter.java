@@ -6,7 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import weatherapp.danarcheronline.com.weatherapp.Data.Database.WeatherForecastEntity;
 import weatherapp.danarcheronline.com.weatherapp.R;
+import weatherapp.danarcheronline.com.weatherapp.UI.List.MainActivity;
 
 public class WeatherDataRecyclerViewAdapter extends RecyclerView.Adapter<WeatherDataRecyclerViewAdapter.WeatherDataViewHolder> {
 
@@ -14,7 +17,7 @@ public class WeatherDataRecyclerViewAdapter extends RecyclerView.Adapter<Weather
     private static final String TAG = WeatherDataRecyclerViewAdapter.class.getSimpleName();
 
 //    member variable to hold weather data
-    String[] weatherDataArray;
+    WeatherForecastEntity[] weatherDataArray;
 
 //
     private WeatherItemClickListener weatherItemClickListener;
@@ -60,8 +63,20 @@ public class WeatherDataRecyclerViewAdapter extends RecyclerView.Adapter<Weather
      */
     @Override
     public void onBindViewHolder(@NonNull WeatherDataViewHolder weatherDataViewHolder, int adapterPosition) {
-        String weatherItemString = weatherDataArray[adapterPosition];
+        WeatherForecastEntity weatherForecastEntity = weatherDataArray[adapterPosition];
+        String weatherItemString = makeDisplayStringFromWeatherForecastEntity(weatherForecastEntity);
         weatherDataViewHolder.tv_weather_data_item_info.setText(weatherItemString);
+    }
+
+    @NonNull
+    private String makeDisplayStringFromWeatherForecastEntity(WeatherForecastEntity weatherForecastEntity) {
+        String description = weatherForecastEntity.getWeatherDescription();
+        String high = weatherForecastEntity.getHighTemperature();
+        String low = weatherForecastEntity.getLowTemperature();
+
+        return "Day: ? - " + description + "\n"
+        + "Lowest Temperature: " + low + "\n"
+        + "Highest Temperature" + high;
     }
 
     /**
@@ -103,14 +118,15 @@ public class WeatherDataRecyclerViewAdapter extends RecyclerView.Adapter<Weather
         /**
          * When a recycler view item is clicked, the corresponding weather data is passed
          * into {@link WeatherDataRecyclerViewAdapter}'s onClick function,
-         * which is implemented in {@link weatherapp.danarcheronline.com.weatherapp.MainActivity}
+         * which is implemented in {@link MainActivity}
          * @param view
          */
         @Override
         public void onClick(View view) {
             int adapterPosition = getAdapterPosition();
-            String weatherDataString = weatherDataArray[adapterPosition];
-            weatherItemClickListener.onClickWeatherItem(weatherDataString);
+            WeatherForecastEntity weatherForecastEntity = weatherDataArray[adapterPosition];
+            String weatherItemString = makeDisplayStringFromWeatherForecastEntity(weatherForecastEntity);
+            weatherItemClickListener.onClickWeatherItem(weatherItemString);
         }
     }
 
@@ -118,7 +134,7 @@ public class WeatherDataRecyclerViewAdapter extends RecyclerView.Adapter<Weather
      * Set the weather data and notify the recycler view that changes have been made to the adapter
      * @param weatherDataArray
      */
-    public void setWeatherDataArray(String[] weatherDataArray) {
+    public void setWeatherDataArray(WeatherForecastEntity[] weatherDataArray) {
         this.weatherDataArray = weatherDataArray;
 //        let the recycler view know that the data has changed and ti should reflect these updates
         notifyDataSetChanged();
