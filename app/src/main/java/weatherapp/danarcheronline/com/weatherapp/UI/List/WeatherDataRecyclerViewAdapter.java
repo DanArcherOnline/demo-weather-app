@@ -1,8 +1,8 @@
-package weatherapp.danarcheronline.com.weatherapp.RecyclerView;
+package weatherapp.danarcheronline.com.weatherapp.UI.List;
 
-import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +12,10 @@ import java.util.List;
 
 import weatherapp.danarcheronline.com.weatherapp.Data.Database.WeatherForecastEntity;
 import weatherapp.danarcheronline.com.weatherapp.R;
-import weatherapp.danarcheronline.com.weatherapp.UI.List.MainActivity;
 
 public class WeatherDataRecyclerViewAdapter extends RecyclerView.Adapter<WeatherDataRecyclerViewAdapter.WeatherDataViewHolder> {
 
-//    tag for debuggin purposes
+//    tag for debugging purposes
     private static final String TAG = WeatherDataRecyclerViewAdapter.class.getSimpleName();
 
 //    member variable to hold weather data
@@ -89,8 +88,10 @@ public class WeatherDataRecyclerViewAdapter extends RecyclerView.Adapter<Weather
     @Override
     public int getItemCount() {
         if(weatherEntitiesDataArray == null) {
+            Log.d(TAG, "getItemCount: 0 items in recycler view");
             return 0;
         }
+        Log.d(TAG, "getItemCount: " + weatherEntitiesDataArray.size() + " items in recycler view");
         return weatherEntitiesDataArray.size();
     }
 

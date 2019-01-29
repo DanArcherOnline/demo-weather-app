@@ -34,8 +34,10 @@ public class Repository {
         LiveData<WeatherForecastEntity[]> weatherDataFromNetwork = mWeatherNetworkDataSource.getmDownloadedWeatherForecasts();
         weatherDataFromNetwork.observeForever(newDataFromNetwork -> {
             mAppExecutors.diskIO().execute(() -> {
+                deleteAllWeatherData();
+                Log.d(TAG, "Repository: database cleared");
                 dao.bulkInsert(newDataFromNetwork);
-                Log.d(TAG, "Repository: Bulk inserted new weather entities into database");
+                Log.d(TAG, "Repository: Bulk inserted " + newDataFromNetwork.length + " new weather entities into database");
             });
         });
     }
@@ -54,6 +56,10 @@ public class Repository {
         return mWeatherDAO.getAll();
     }
 
+    private void deleteAllWeatherData() {
+        mWeatherDAO.deleteAll();
+    }
+
     private synchronized void initializeData() {
         if(mInitialized) {
             return;
@@ -66,6 +72,10 @@ public class Repository {
     private void fetchWeather(Context context) {
         mWeatherNetworkDataSource.fetchWeather(context);
         Log.d(TAG, "fetchWeather: Repository asked network datasource to fetch the weather");
+    }
+
+    public void temporaryRefreshNetworkData(Context context) {
+        fetchWeather(context);
     }
 
 }

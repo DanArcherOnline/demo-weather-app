@@ -3,7 +3,6 @@ package weatherapp.danarcheronline.com.weatherapp.UI.List;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,11 +16,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import weatherapp.danarcheronline.com.weatherapp.Data.Database.WeatherForecastEntity;
 import weatherapp.danarcheronline.com.weatherapp.UI.Preferences.PreferenceSettingsActivity;
 import weatherapp.danarcheronline.com.weatherapp.R;
-import weatherapp.danarcheronline.com.weatherapp.RecyclerView.WeatherDataRecyclerViewAdapter;
-import weatherapp.danarcheronline.com.weatherapp.Data.Network.WeatherSync;
 import weatherapp.danarcheronline.com.weatherapp.UI.Detail.WeatherDetailsActivity;
 import weatherapp.danarcheronline.com.weatherapp.Utils.InjectorUtils;
 
@@ -61,14 +57,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forecast);
 
-        MainActivityViewModelFactory factory = InjectorUtils.provideMainActivityViewModelFactory(this);
-        mainActivityViewModel = ViewModelProviders.of(this, factory).get(MainActivityViewModel.class);
-        mainActivityViewModel.getWeather().observe(this, weatherForecastEntity -> {
-            //updat ui here
-            Log.d(TAG, "onCreate: info from MainActivityViewModel: " + weatherForecastEntity);
-            adapter.setWeatherEntitiesDataArray(weatherForecastEntity);
-
-        });
+//        set up view model
+        initViewModel();
 
 //        set up views
         initViews();
@@ -82,8 +72,27 @@ public class MainActivity extends AppCompatActivity
 
 
 //        show weather data view and get weather data
-        loadWeatherData();
+//        showWeatherDataView();
 
+    }
+
+    private void initViewModel() {
+        MainActivityViewModelFactory factory = InjectorUtils.provideMainActivityViewModelFactory(this);
+        mainActivityViewModel = ViewModelProviders.of(this, factory).get(MainActivityViewModel.class);
+        Log.d(TAG, "onCreate: MainActivityViewModel has been created");
+        mainActivityViewModel.getWeather().observe(this, weatherForecastEntities -> {
+            //update ui here
+            adapter.setWeatherEntitiesDataArray(weatherForecastEntities);
+            if(weatherForecastEntities != null && weatherForecastEntities.size() != 0) {
+                showWeatherDataView();
+                Log.d(TAG, "initViewModel: display weather data view");
+            }
+            else {
+                Log.d(TAG, "initViewModel: loading ...");
+                showLoadingView();
+            }
+            Log.d(TAG, "initViewModel: UI updated");
+        });
     }
 
 
@@ -95,17 +104,6 @@ public class MainActivity extends AppCompatActivity
         PreferenceManager.getDefaultSharedPreferences(this)
                 .unregisterOnSharedPreferenceChangeListener(this);
 
-    }
-
-
-    /**
-     *  Turns the view for the weather data on, starts the async task to get and display
-     *  the weather data. If it's not successful, an error message is displayed.
-     */
-    private void loadWeatherData() {
-        showWeatherDataView();
-//        start the async task with the location string parameter to get the weather data
-//        new GetWeatherDataAsyncTask().execute();
     }
 
 
@@ -139,8 +137,15 @@ public class MainActivity extends AppCompatActivity
      * Makes the recycler view that holds all the weather data visible and the error message view invisible
      */
     private void showWeatherDataView() {
-        tv_error_message_display.setVisibility(View.INVISIBLE);
+        pb_loading_indicator.setVisibility(View.INVISIBLE);
         rv_weather_data.setVisibility(View.VISIBLE);
+        tv_error_message_display.setVisibility(View.INVISIBLE);
+    }
+
+    private void showLoadingView() {
+        pb_loading_indicator.setVisibility(View.VISIBLE);
+        rv_weather_data.setVisibility(View.INVISIBLE);
+        tv_error_message_display.setVisibility(View.INVISIBLE);
     }
 
 
@@ -150,6 +155,7 @@ public class MainActivity extends AppCompatActivity
     private void showErrorMessageView() {
         tv_error_message_display.setVisibility(View.VISIBLE);
         rv_weather_data.setVisibility(View.INVISIBLE);
+        pb_loading_indicator.setVisibility(View.INVISIBLE);
     }
 
 
@@ -262,8 +268,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.options_menu_refresh:
 //                refresh the weather data by setting the adapters data to null and making a new request
                 // TODO: (03/01/2019) replace refresh function with firebase job scheduler
+                Log.d(TAG, "onOptionsItemSelected: refresh clicked");
                 adapter.setWeatherEntitiesDataArray(null);
-                loadWeatherData();
+                InjectorUtils.provideRepository(this).temporaryRefreshNetworkData(this);
                 return true;
             case R.id.options_menu_preference_settings:
 //                open preference settings screen
